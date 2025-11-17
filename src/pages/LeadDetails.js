@@ -19,7 +19,6 @@ export default function LeadDetails() {
   const [newComment, setNewComment] = useState("");
   const [commentList, setCommentList] = useState([]);
 
-  
   useEffect(() => {
     if (comments && comments.length > 0) {
       setCommentList(comments);
@@ -37,7 +36,8 @@ export default function LeadDetails() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             commentText: newComment,
-            author: Lead?.salesAgent?.id,
+            // replace with logged-in user's id if available
+            author: Lead?.salesAgent?.id || null,
           }),
         }
       );
@@ -45,10 +45,12 @@ export default function LeadDetails() {
       if (!response.ok) throw new Error("Failed to post comment.");
 
       const created = await response.json();
+
+      // Add new comment to top of list
       setCommentList([created, ...commentList]);
       setNewComment("");
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -62,12 +64,11 @@ export default function LeadDetails() {
       <div className="flex-grow-1 px-4">
         <h2 className="text-center mt-4">Lead: {Lead?.name}</h2>
 
-        
         <h4 className="mt-4">Comments</h4>
         {commentList.map((comment) => (
-          <div key={comment._id} className="border p-2 mb-2 rounded">
+          <div key={comment.id} className="border p-2 mb-2 rounded">
             <strong>
-              {comment.author?.name} —{" "}
+              {comment.author} —{" "}
               {new Date(comment.createdAt).toLocaleString()}
             </strong>
             <p>{comment.commentText}</p>

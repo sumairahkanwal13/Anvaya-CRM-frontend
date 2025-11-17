@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar";
 import useFetch from "../useFetch";
 
 export default function SalesAgentDetails() {
-  const { data: leads, loading, error } = useFetch("https://anvaya-crm-backend-rosy.vercel.app/leads", []);
+  const { data: Lead, loading, error } = useFetch("https://anvaya-crm-backend-rosy.vercel.app/leads", []);
   const { data: agents } = useFetch("https://anvaya-crm-backend-rosy.vercel.app/agents", []);
 
   const [selectedAgent, setSelectedAgent] = useState("All");
@@ -12,11 +12,11 @@ export default function SalesAgentDetails() {
   const [sortOrder, setSortOrder] = useState("newest");
 
   if (loading) return <p className="text-center mt-4">Loading...</p>;
-  if (error || !Array.isArray(leads)) return <p>Error loading agent data.</p>;
+  if (error || !Array.isArray(Lead)) return <p>Error loading agent data.</p>;
 
   
 
-  let filteredLeads = leads;
+  let filteredLeads = Lead;
 
   
   if (selectedAgent !== "All") {

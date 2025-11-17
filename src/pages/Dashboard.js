@@ -3,7 +3,7 @@ import useFetch from "../useFetch";
 import { Link } from "react-router-dom";
 
 export default function Dashboard() {
-  const { data: leads, loading, error } = useFetch(
+  const { data: Lead, loading, error } = useFetch(
     "https://anvaya-crm-backend-rosy.vercel.app/leads",
     []
   );
@@ -35,17 +35,13 @@ export default function Dashboard() {
           <h4 className="mb-3">Leads Overview</h4>
 
           <div className="d-flex flex-wrap gap-3">
-            {leads.slice(0, 3).map((lead) => (
-              <div
-                key={lead._id || lead.name}
-                className="card p-3 shadow-sm"
-                style={{ width: "220px" }}
-              >
-                <h6 className="mb-2">{lead.name}</h6>
-                <p className="small mb-1">Status: {lead.status}</p>
-                <p className="small text-muted">Priority: {lead.priority}</p>
-              </div>
-            ))}
+            {Lead.slice(0, 3).map((lead) => (
+                <div key={lead._id || lead.name} className="card p-3 shadow-sm" style={{ width: "220px" }}>
+                    <h6 className="mb-2">{lead.name}</h6>
+                    <p className="small mb-1">Status: {lead.status}</p>
+                    <p className="small text-muted">Priority: {lead.priority}</p>
+                    </div>
+                ))}
           </div>
         </div>
 

@@ -16,7 +16,7 @@ export default function LeadList(){
     if(sort) queryParams.append("sort", sort)
 
         const apiUrl = `https://anvaya-crm-backend-rosy.vercel.app/leads?${queryParams.toString()}`;
-        const { data:leads, loading, error } = useFetch(apiUrl,[]);
+        const { data:Lead, loading, error } = useFetch(apiUrl,[]);
 
         if(loading) return <p className="text-center mt-5">Loading Leads.....</p>
         if(error) return <p className="text-center mt-5">Error occurred while fetching data.</p>
@@ -56,25 +56,24 @@ export default function LeadList(){
                             <option value="Priority">Priority</option>
                             <option value="timeToClose">Time to close</option>
                         </select>
-
-                        <button className="btn btn-primary ms-auto">
-                        <Link className="text-decoration-none text-white" to="/leadForm">
+                        
+                        <Link className="text-decoration-none text-white btn btn-primary ms-auto" to="/leadForm">
                         Add New Lead
                         </Link>
-                        </button>
+                       
                     </div>
 
                     <div className="mb-4">
                         <h4>Lead Overview</h4>
                         <div className="d-flex flex-wrap gap-3">
-                          { leads.length > 0 ? (
-                            leads.map((lead) => (
+                          { Lead.length > 0 ? (
+                            Lead.map((lead) => (
                                 <div key={lead._id} className="card p-3 shadow-sm w-100">
                                     <p><strong>Name:</strong> {lead.name}</p>
                                     <p><strong>Status:</strong> {lead.status}</p>
                                     <p><strong>Sales Agent:</strong> {lead.salesAgent?.name || "N/A"}</p>
                                     <p><strong>Source:</strong> {lead.source}</p>
-                                    <Link to={`/leadDetails/${lead.id}`}>
+                                    <Link to={`/leadDetails/${lead._id}`}>
                                     View Details
                                     </Link>
                                 </div>

@@ -11,10 +11,15 @@ import AddSalesAgent from './pages/AddSalesAgent';
 import Report from './pages/Report';
 import LeadStatusView from './pages/LeadStatusView';
 import SalesAgentDetails from './pages/SalesAgentDetails';
+import Sidebar from './components/Sidebar';
+import Footer from './components/Footer';
 
 function App() {
   return (
     <Router>
+      <div className='d-flex'>
+      <Sidebar/>
+      <div className='flex-grow-1 main-content px-4'>
       <Routes>
         <Route path="/" element={< Dashboard/>}/>
         <Route path="/leadForm" element={<LeadForm/>}/>
@@ -26,6 +31,9 @@ function App() {
         <Route path='/salesAgentDetails' element={<SalesAgentDetails/>}/>
         <Route path='/report' element={<Report/>}/>
       </Routes>
+      <Footer/>
+      </div>
+      </div>
     </Router>
   );
 }

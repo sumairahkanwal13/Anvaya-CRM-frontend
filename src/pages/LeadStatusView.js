@@ -19,7 +19,7 @@ export default function LeadStatusView() {
   if (loading) return <p className="text-center mt-4">Loading...</p>;
   if (error) return <p className="text-center mt-4">Error occurred while fetching data.</p>;
 
-  // Filtering and sorting directly in render
+  // Apply all filters in sequence
   let filteredLeads = Lead.filter((lead) => lead.status === status);
 
   if (agentFilter !== "All") {
@@ -31,8 +31,9 @@ export default function LeadStatusView() {
   }
 
   filteredLeads.sort((a, b) => {
-    if (sortOrder === "newest") return new Date(b.createdAt) - new Date(a.createdAt);
-    return new Date(a.createdAt) - new Date(b.createdAt);
+    return sortOrder === "newest"
+      ? new Date(b.createdAt) - new Date(a.createdAt)
+      : new Date(a.createdAt) - new Date(b.createdAt);
   });
 
   return (
@@ -104,7 +105,7 @@ export default function LeadStatusView() {
       <div className="card p-3">
         <h4 className="mb-3">Status: {status}</h4>
         {filteredLeads.length === 0 ? (
-          <p>No lead found for this status.</p>
+          <p>No leads found for this status.</p>
         ) : (
           <ul className="list-group">
             {filteredLeads.map((lead) => (

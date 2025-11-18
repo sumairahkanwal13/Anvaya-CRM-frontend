@@ -75,156 +75,146 @@ export default function LeadForm(){
             setErrorMessage("An error occurred while adding the lead. Please try again.");
         }
     }
-    return(
-        <div className="d-flex mt-2">
-      
-      <Sidebar />
+    return (
+    <div className="lead-form-page px-4 mt-4">
+      <h2 className="text-center mb-4">Create New Lead</h2>
 
-      
-      <div className="flex-grow-1 px-4" >
+      {successMessage && (
+        <div className="alert alert-success" role="alert">
+          {successMessage}
+        </div>
+      )}
 
-        <h2 className="text-center mb-4 mt-4">Create New Lead</h2>
+      {errorMessage && (
+        <div className="alert alert-danger" role="alert">
+          {errorMessage}
+        </div>
+      )}
 
-        { successMessage && (
-                    <div className="alert alert-success" role="alert">
-                        {successMessage}
-                    </div>
-                )}
+      <form onSubmit={handleSubmit} className="card p-4 shadow-sm">
+        <div className="mb-3">
+          <label className="form-label">Lead Name:</label>
+          <input
+            type="text"
+            name="name"
+            className="form-control"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-                { errorMessage && (
-                    <div className="alert alert-danger" role="alert">
-                        {errorMessage}
-                    </div>
-                )}
+        <div className="mb-3">
+          <label className="form-label">Lead Source:</label>
+          <select
+            name="source"
+            className="form-select"
+            value={formData.source}
+            onChange={handleChange}
+          >
+            <option value="">Select Source</option>
+            <option value="Website">Website</option>
+            <option value="Referral">Referral</option>
+            <option value="Cold Call">Cold Call</option>
+            <option value="Advertisement">Advertisement</option>
+            <option value="Email">Email</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
 
-        <form onSubmit={handleSubmit} className="card p-4 shadow-sm">
+        <div className="mb-3">
+          <label className="form-label">Sales Agent:</label>
+          <select
+            name="salesAgent"
+            className="form-select"
+            value={formData.salesAgent}
+            onChange={handleChange}
+          >
+            <option value="">Select Agent</option>
+            {agents.map((agent) => (
+              <option key={agent._id} value={agent._id}>
+                {agent.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          <div className="mb-3">
-            <label className="form-label">Lead Name:</label>
+        <div className="mb-3">
+          <label className="form-label">Lead Status:</label>
+          <select
+            name="status"
+            className="form-select"
+            value={formData.status}
+            onChange={handleChange}
+          >
+            <option>New</option>
+            <option>Contacted</option>
+            <option>Qualified</option>
+            <option>Proposal Sent</option>
+            <option>Closed</option>
+          </select>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Tags:</label>
+          <div className="d-flex">
             <input
               type="text"
-              name="name"
               className="form-control"
-              value={formData.name}
-              onChange={handleChange}
-              required
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
             />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Lead Source:</label>
-            <select
-              name="source"
-              className="form-select"
-              value={formData.source}
-              onChange={handleChange}
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={handleAddTag}
             >
-              <option value="">Select Source</option>
-              <option value="Website">Website</option>
-              <option value="Referral">Referral</option>
-              <option value="Cold Call">Cold Call</option>
-              <option value="Advertisement">Advertisement</option>
-              <option value="Email">Email</option>
-              <option value="Other">Other</option>
-            </select>
+              Add Tag
+            </button>
           </div>
+        </div>
 
-          <div className="mb-3">
-            <label className="form-label">Sales Agent:</label>
-            <select
-              name="salesAgent"
-              className="form-select"
-              value={formData.salesAgent}
-              onChange={handleChange}
-            >
-              <option value="">Select Agent</option>
-              {agents.map((agent) => (
-                <option key={agent._id} value={agent._id}>
-                  {agent.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        {formData.tags.map((tag) => (
+          <span
+            key={tag}
+            className="badge bg-success me-2"
+            onClick={() => handleRemoveTag(tag)}
+            style={{ cursor: "pointer" }}
+          >
+            {tag}
+          </span>
+        ))}
 
-          <div className="mb-3">
-            <label className="form-label">Lead Status:</label>
-            <select
-              name="status"
-              className="form-select"
-              value={formData.status}
-              onChange={handleChange}
-            >
-              <option>New</option>
-              <option>Contacted</option>
-              <option>Qualified</option>
-              <option>Proposal Sent</option>
-              <option>Closed</option>
-            </select>
-          </div>
+        <div className="mb-3 mt-3">
+          <label className="form-label">Time to Close (days):</label>
+          <input
+            type="number"
+            name="timeToClose"
+            className="form-control"
+            value={formData.timeToClose}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-          
-          <div className="mb-3">
-            <label className="form-label">Tags:</label>
-            <div className="d-flex">
-              <input
-                type="text"
-                className="form-control"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-              />
-              <button
-                type="button"
-                className="btn btn-outline-primary"
-                onClick={handleAddTag}
-              >
-                Add Tag
-              </button>
-            </div>
-          </div>
+        <div className="mb-3">
+          <label className="form-label">Priority:</label>
+          <select
+            name="priority"
+            className="form-select"
+            value={formData.priority}
+            onChange={handleChange}
+          >
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+          </select>
+        </div>
 
-          {formData.tags.map((tag) => (
-            <span
-              key={tag}
-              className="badge bg-success me-2"
-              onClick={() => handleRemoveTag(tag)}
-              style={{ cursor: "pointer" }}
-            >
-              {tag}
-            </span>
-          ))}
-
-          <div className="mb-3">
-            <label className="form-label">Time to Close (days):</label>
-            <input
-              type="number"
-              name="timeToClose"
-              className="form-control"
-              value={formData.timeToClose}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Priority:</label>
-            <select
-              name="priority"
-              className="form-select"
-              value={formData.priority}
-              onChange={handleChange}
-            >
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
-          </div>
-
-          <button className="btn btn-success w-100" type="submit">
-            Add New Lead
-          </button>
-        </form>
-      </div>
+        <button className="btn btn-success w-100" type="submit">
+          Add New Lead
+        </button>
+      </form>
     </div>
   );
-        
 }

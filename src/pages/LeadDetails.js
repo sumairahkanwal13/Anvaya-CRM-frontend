@@ -36,7 +36,6 @@ export default function LeadDetails() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             commentText: newComment,
-            // replace with logged-in user's id if available
             author: Lead?.salesAgent?.id || null,
           }),
         }
@@ -46,7 +45,7 @@ export default function LeadDetails() {
 
       const created = await response.json();
 
-      // Add new comment to top of list
+      
       setCommentList([created, ...commentList]);
       setNewComment("");
     } catch (error) {
@@ -58,34 +57,34 @@ export default function LeadDetails() {
   if (error) return <p>Error fetching lead.</p>;
 
   return (
-    <div className="d-flex mt-4">
-      <Sidebar />
+  <div className="lead-details-page">
 
-      <div className="flex-grow-1 px-4">
-        <h2 className="text-center mt-4">Lead: {Lead?.name}</h2>
+    <h2 className="text-center mt-4">Lead: {Lead?.name}</h2>
 
-        <h4 className="mt-4">Comments</h4>
-        {commentList.map((comment) => (
-          <div key={comment.id} className="border p-2 mb-2 rounded">
-            <strong>
-              {comment.author} —{" "}
-              {new Date(comment.createdAt).toLocaleString()}
-            </strong>
-            <p>{comment.commentText}</p>
-          </div>
-        ))}
+    
+    <h4 className="mt-4">Comments</h4>
 
-        <textarea
-          className="form-control mb-2"
-          rows="2"
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-        />
-
-        <button className="btn btn-primary" onClick={handleSubmit}>
-          Submit
-        </button>
+    {commentList.map((comment) => (
+      <div key={comment.id} className="border p-2 mb-2 rounded">
+        <strong>
+          {comment.author} — {new Date(comment.createdAt).toLocaleString()}
+        </strong>
+        <p>{comment.commentText}</p>
       </div>
-    </div>
-  );
+    ))}
+
+    
+    <textarea
+      className="form-control mb-2"
+      rows="2"
+      value={newComment}
+      onChange={(e) => setNewComment(e.target.value)}
+    />
+
+    <button className="btn btn-primary" onClick={handleSubmit}>
+      Submit
+    </button>
+
+  </div>
+);
 }

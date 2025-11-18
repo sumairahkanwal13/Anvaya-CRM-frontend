@@ -9,11 +9,7 @@ export default function SalesAgentsList(){
     if(error) return <p className="text-center mt-4">Error occurred while fetching data.</p>
     
     return (
-    <div className="d-flex mt-4">
-    <Sidebar />
-
-    <div className="flex-grow-1 px-4">
-
+    <div className="px-4 mt-4 flex-grow-1">
       <h1 className="text-center mb-4 mt-4">Sales Agent Management</h1>
 
       <div className="card p-4 shadow-sm mb-4">
@@ -24,7 +20,10 @@ export default function SalesAgentsList(){
         ) : (
           <ul className="list-group">
             {agents.map((agent) => (
-              <li key={agent._id} className="list-group-item d-flex justify-content-between align-items-center">
+              <li
+                key={agent._id}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
                 <div>
                   <strong>{agent.name}</strong>
                   <br />
@@ -41,9 +40,6 @@ export default function SalesAgentsList(){
           Add New Agent
         </Link>
       </div>
-
     </div>
-  </div>
-);
-
+  );
 }

@@ -51,42 +51,34 @@ export default function Report() {
             },
         ],
     };
+  return (
+    <div className="report-page px-4 mt-4">
+      <h2 className="mb-3 text-center">Anvaya CRM Reports</h2>
 
-    return(
-        <div className="d-flex">
-            <Sidebar/>
-            <div className="flex-grow-1 p-4">
-                <h2 className="mb-3 text-center">Anvaya CRM Reports</h2>
-
-                <div className="container">
-                    <div className="card mb-4 p-3">
-                        <h4 className="text-center mb-3">Leads Closed Vs Pipeline</h4>
-                        <div  style={{ width: "300px", height: "300px", margin: "0 auto" }}>
-                            <Pie data={closedVsPipeline} />
-                        </div>
-                    </div>
-
-                    <div className="row">
-
-                        <div className="col-md-6">
-                            <div className="card mb-4 p-3">
-                                <h4 className="text-center mb-3">Lead Closed by Sales Agent</h4>
-                                <Bar data={closedByAgentData}/>
-                            </div>
-                        </div>
-
-                        <div className="col-md-6">
-                            <div className="card mb-4 p-3">
-                                <h4 className="text-center mb-3">Lead Status Distribution</h4>
-                                <Pie data={statusDistributionData} />
-                                </div>
-                                
-                            </div>
-                    </div>
-                </div>
-            </div>
+      <div className="container">
+        <div className="card mb-4 p-3">
+          <h4 className="text-center mb-3">Leads Closed Vs Pipeline</h4>
+          <div style={{ width: "300px", height: "300px", margin: "0 auto" }}>
+            <Pie data={closedVsPipeline} />
+          </div>
         </div>
-    )
 
+        <div className="row">
+          <div className="col-md-6">
+            <div className="card mb-4 p-3">
+              <h4 className="text-center mb-3">Lead Closed by Sales Agent</h4>
+              <Bar data={closedByAgentData} />
+            </div>
+          </div>
 
+          <div className="col-md-6">
+            <div className="card mb-4 p-3">
+              <h4 className="text-center mb-3">Lead Status Distribution</h4>
+              <Pie data={statusDistributionData} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

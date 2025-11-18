@@ -48,11 +48,7 @@ export default function AddSalesAgent() {
 
   return (
     <div className="container mt-5">
-
-      <Link to="/salesAgentsList" className="btn btn-link mb-3">
-        ← Go Back to Sales Agent List
-      </Link>
-
+        
       <div className="row justify-content-center">
         <div className="col-md-6">
 

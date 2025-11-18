@@ -41,8 +41,6 @@ export default function LeadDetails() {
   if (error) return <p className="text-center mt-5">Error occurred while fetching data.</p>;
 
   return (
-    <div className="d-flex mt-4">
-      <Sidebar />
 
       <div className="flex-grow-1 px-4">
         <h2 className="text-center mb-4 mt-4">Lead Management: {Lead.name}</h2>
@@ -95,6 +93,5 @@ export default function LeadDetails() {
           <button className="btn btn-primary" onClick={handleSubmit}>Submit</button>
         </div>
       </div>
-    </div>
   );
 }

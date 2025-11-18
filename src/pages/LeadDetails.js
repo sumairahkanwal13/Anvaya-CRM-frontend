@@ -45,7 +45,7 @@ export default function LeadDetails() {
       <Sidebar />
 
       <div className="flex-grow-1 px-4">
-        <h2 className="text-center mb-4 mt-4">Lead Management: {leads.name}</h2>
+        <h2 className="text-center mb-4 mt-4">Lead Management: {Lead.name}</h2>
 
         
         <div className="mb-4">

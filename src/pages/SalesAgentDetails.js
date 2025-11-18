@@ -23,7 +23,7 @@ export default function SalesAgentDetails() {
 
   if (selectedAgent !== "All") {
     filteredLeads = filteredLeads.filter(
-      (lead) => lead.salesAgent?.id === selectedAgent
+      (lead) => lead.salesAgent?._id === selectedAgent
     );
   }
 

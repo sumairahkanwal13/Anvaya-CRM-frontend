@@ -39,11 +39,17 @@ export default function SalesAgentDetails() {
     );
   }
 
-  if (sortOrder === "newest") {
-    filteredLeads.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  } else {
-    filteredLeads.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-  }
+  //if (sortOrder === "newest") {
+    //filteredLeads.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  //} else {
+    //filteredLeads.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  //}
+
+  filteredLeads.sort((a, b) =>
+    sortOrder === "newest"
+      ? new Date(b.createdAt) - new Date(a.createdAt)
+      : new Date(a.createdAt) - new Date(b.createdAt)
+  );
 
   return (
     <div className="flex-grow-1 px-4 mt-4">

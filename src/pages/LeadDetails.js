@@ -24,7 +24,7 @@ export default function LeadDetails() {
         },
         body: JSON.stringify({
             commentText: newComment,
-            author: Lead.salesAgent?._id
+            author: Lead?.salesAgent?._id
         })
     })
 

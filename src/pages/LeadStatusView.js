@@ -19,7 +19,7 @@ export default function LeadStatusView() {
   if (loading) return <p className="text-center mt-4">Loading...</p>;
   if (error) return <p className="text-center mt-4">Error occurred while fetching data.</p>;
 
-  // Apply all filters in sequence
+  
   let filteredLeads = Lead.filter((lead) => lead.status === status);
 
   if (agentFilter !== "All") {
@@ -40,7 +40,7 @@ export default function LeadStatusView() {
     <div className="flex-grow-1 px-4 mt-4">
       <h3 className="text-center mb-4">Leads by Status</h3>
 
-      {/* Filters */}
+      
       <div className="card mb-4 p-3">
         <div className="row g-3">
           <div className="col-md-3">

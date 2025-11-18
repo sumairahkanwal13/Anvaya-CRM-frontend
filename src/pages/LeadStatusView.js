@@ -22,9 +22,18 @@ export default function LeadStatusView() {
   // Apply all filters in sequence
   let filteredLeads = Lead.filter((lead) => lead.status === status);
 
-  if (agentFilter !== "All") {
-    filteredLeads = filteredLeads.filter((lead) => lead.salesAgent?._id === agentFilter);
-  }
+  //if (agentFilter !== "All") {
+   // filteredLeads = filteredLeads.filter((lead) => lead.salesAgent?._id === agentFilter);
+ // }
+
+ if (agentFilter !== "All") {
+    filteredLeads = filteredLeads.filter((lead) => {
+        return lead.salesAgent && lead.salesAgent._id === agentFilter;
+    });
+}
+
+
+
 
   if (priorityFilter !== "All") {
     filteredLeads = filteredLeads.filter((lead) => lead.priority === priorityFilter);

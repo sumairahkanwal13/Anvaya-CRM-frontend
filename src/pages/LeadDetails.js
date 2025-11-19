@@ -1,136 +1,92 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import useFetch from "../useFetch";
+import { useParams } from "react-router-dom";
+import { useState } from "react";
 
 export default function LeadDetails() {
   const { id } = useParams();
+  const { data: Lead, loading, error } = useFetch(`https://anvaya-crm-backend-rosy.vercel.app/leads/${id}`, {});
+  const { data: comments, loading: commentsLoading } = useFetch(`https://anvaya-crm-backend-rosy.vercel.app/leads/${id}/comments`, {});
 
-  const [lead, setLead] = useState(null);
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [ newComment, setNewComment ] = useState("");
+  const [ commentList, setCommentList ] = useState([]);
 
-  // Fetch Lead + Comments
-  useEffect(() => {
-    fetchLead();
-    fetchComments();
-  }, [id]);
+  if (!commentsLoading && commentList.length === 0 && comments.length > 0) {
+    setCommentList(comments);
+  }
 
-  const fetchLead = async () => {
+  const handleSubmit = async() => {
+    if (!newComment.trim()) return ("Please enter a comment first.");
     try {
-      const res = await axios.get(`http://localhost:5000/api/leads/${id}`);
-      setLead(res.data);
-      setLoading(false);
-    } catch (error) {
-      console.log("Error fetching lead:", error);
-    }
-  };
-
-  const fetchComments = async () => {
-    try {
-      const res = await axios.get(`http://localhost:5000/api/comments/${id}`);
-      setComments(res.data);
-    } catch (error) {
-      console.log("Error fetching comments:", error);
-    }
-  };
-
-  const handleCommentSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!newComment.trim()) return;
-
-    try {
-      await axios.post("http://localhost:5000/api/comments", {
-        leadId: id,
-        text: newComment,
-        author: "Admin", // replace with logged-in user later
+      const response = await fetch(`https://anvaya-crm-backend-rosy.vercel.app/leads/${id}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          commentText: newComment,
+          lead: id,
+          author: Lead?.salesAgent?._id
+        })
       });
 
-      setNewComment("");
-      fetchComments(); // refresh comments instantly
-    } catch (error) {
-      console.log("Error posting comment:", error);
-    }
-  };
+      if (!response.ok) throw new Error ("Failed to post comment.");
 
-  if (loading || !lead) return <p>Loading lead...</p>;
+      const createdComment = await response.json();
+      setCommentList([createdComment, ...commentList]);
+      setNewComment("");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  if (loading) return <p className="text-center mt-5">.....Loading Lead Data</p>;
+  if (error) return <p className="text-center mt-5">Error occurred while fetching data.</p>;
 
   return (
-    <div className="container mt-4">
+    <div className="flex-grow-1 px-4">
+      <h2 className="text-center mb-4 mt-4">Lead Management: {Lead.name}</h2>
 
-      {/* PAGE HEADER */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Lead Management: {lead.name}</h2>
-        <Link to="/leadList" className="btn btn-secondary">Back to Leads</Link>
+      <div className="mb-4">
+        <h4 className="mb-3">Lead Details</h4>
+        {Lead && (
+          <ul className="list-group" style={{ maxWidth: "400px" }}>
+            <li className="list-group-item"><strong>Lead Name:</strong> {Lead.name}</li>
+            <li className="list-group-item"><strong>Sales Agent:</strong> {Lead.salesAgent?.name || "N/A"}</li>
+            <li className="list-group-item"><strong>Lead Source:</strong> {Lead.source}</li>
+            <li className="list-group-item"><strong>Lead Status:</strong> {Lead.status}</li>
+            <li className="list-group-item"><strong>Priority:</strong> {Lead.priority}</li>
+            <li className="list-group-item"><strong>Time to Close:</strong> {Lead.timeToClose} Days</li>
+          </ul>
+        )}
       </div>
 
-      <div className="row">
-
-        {/* LEFT SIDEBAR (BACK / DASHBOARD) */}
-        <div className="col-3">
-          <div className="list-group">
-            <Link to="/" className="list-group-item list-group-item-action">
-              Back to Dashboard
-            </Link>
-          </div>
-        </div>
-
-        {/* MAIN LEAD DETAILS */}
-        <div className="col-9">
-          <div className="card p-3 shadow-sm">
-            <h4>Lead Details</h4>
-
-            <p><strong>Lead Name:</strong> {lead.name}</p>
-            <p><strong>Sales Agent:</strong> {lead.salesAgent?.name || "Not Assigned"}</p>
-            <p><strong>Lead Source:</strong> {lead.leadSource}</p>
-            <p><strong>Lead Status:</strong> {lead.leadStatus}</p>
-            <p><strong>Priority:</strong> {lead.priority}</p>
-            <p><strong>Time to Close:</strong> {lead.timeToClose || "N/A"}</p>
-
-            <Link
-              to={`/leadForm?id=${lead._id}`}
-              className="btn btn-primary mt-2"
-            >
-              Edit Lead Details
-            </Link>
-          </div>
-
-          {/* COMMENTS SECTION */}
-          <div className="card p-3 mt-4 shadow-sm">
-            <h4>Comments</h4>
-
-            {/* LIST OF COMMENTS */}
-            <div className="mt-3">
-              {comments.length === 0 ? (
-                <p>No comments yet.</p>
-              ) : (
-                comments.map((c) => (
-                  <div key={c._id} className="border p-2 mb-2 rounded">
-                    <p><strong>{c.author}</strong> – {new Date(c.createdAt).toLocaleString()}</p>
-                    <p>{c.text}</p>
-                  </div>
-                ))
-              )}
+      <div className="mt-4">
+        <h4>Comments</h4>
+        {commentsLoading ? (
+          <p>Loading Comments...</p>
+        ) : comments.length === 0 ? (
+          <p>No Comments yet</p>
+        ) : (
+          commentList.map((comment) => (
+            <div key={comment.id} className="border p-2 mb-2 rounded">
+              <p>
+                <strong>{comment.author?.name || "Anonymous"} - {new Date(comment.createdAt).toLocaleString()}</strong>
+              </p>
+              <p>{comment.commentText}</p>
             </div>
+          ))
+        )}
+      </div>
 
-            {/* ADD COMMENT */}
-            <form onSubmit={handleCommentSubmit} className="mt-3">
-              <textarea
-                className="form-control"
-                rows="3"
-                placeholder="Add a comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-              ></textarea>
-
-              <button type="submit" className="btn btn-success mt-2">
-                Submit Comment
-              </button>
-            </form>
-
-          </div>
-        </div>
+      <div className="mt-4">
+        <textarea
+          className="form-control mb-2"
+          placeholder="Add a new comment..."
+          rows="2"
+          cols="50"
+          onChange={(e) => setNewComment(e.target.value)}
+        ></textarea>
+        <button className="btn btn-primary" onClick={handleSubmit}>Submit</button>
       </div>
     </div>
   );

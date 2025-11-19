@@ -1,13 +1,17 @@
-import useFetch from "../useFetch";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import useFetch from "../useFetch";
 
 export default function LeadDetails() {
   const { id } = useParams();
-  const { data: Lead, loading, error } = useFetch(
+
+  
+  const { data: Lead, loading: leadLoading, error: leadError } = useFetch(
     `https://anvaya-crm-backend-rosy.vercel.app/leads/${id}`,
     {}
   );
+
+  
   const { data: comments, loading: commentsLoading, error: commentsError } = useFetch(
     `https://anvaya-crm-backend-rosy.vercel.app/leads/${id}/comments`,
     []
@@ -16,23 +20,24 @@ export default function LeadDetails() {
   const [newComment, setNewComment] = useState("");
   const [commentList, setCommentList] = useState([]);
 
-  // Initialize comment list once when comments are fetched
+  
   useEffect(() => {
-    if (!commentsLoading && comments && comments.length > 0) {
+    if (!commentsLoading && Array.isArray(comments)) {
       setCommentList(comments);
     }
   }, [comments, commentsLoading]);
 
   const handleSubmit = async () => {
-    const trimmed = newComment.trim();
-    if (!trimmed) {
-      console.log("Please enter a comment first.");
+    const text = newComment.trim();
+    if (!text) {
+      alert("Please enter a comment first.");
       return;
     }
 
-    const authorId = Lead?.salesAgent?._id;
+    
+    const authorId = Lead?.salesAgent?._id || Lead?.salesAgent?.id;
     if (!authorId) {
-      console.log("No salesAgent assigned, cannot post comment.");
+      alert("No sales agent assigned to this lead. Cannot post comment.");
       return;
     }
 
@@ -41,33 +46,32 @@ export default function LeadDetails() {
         `https://anvaya-crm-backend-rosy.vercel.app/leads/${id}/comments`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            commentText: trimmed,
+            commentText: text,
             author: authorId,
           }),
         }
       );
 
-      const body = await response.json();
-      console.log("POST comment response:", response.status, body);
+      const responseBody = await response.json();
+      console.log("POST comment response:", response.status, responseBody);
 
       if (!response.ok) {
-        throw new Error(body.error || "Failed to post comment.");
+        throw new Error(responseBody.error || "Failed to post comment");
       }
 
-      // Assuming backend returns populated comment with ._id and author.name
-      setCommentList([body, ...commentList]);
+      
+      setCommentList([responseBody, ...commentList]);
       setNewComment("");
     } catch (err) {
       console.error("Error submitting comment:", err);
+      alert("Could not submit comment: " + err.message);
     }
   };
 
-  if (loading) return <p className="text-center mt-5">Loading Lead Data …</p>;
-  if (error) return <p className="text-center mt-5">Error fetching lead.</p>;
+  if (leadLoading) return <p className="text-center mt-5">Loading Lead Data …</p>;
+  if (leadError) return <p className="text-center mt-5">Error fetching lead.</p>;
 
   return (
     <div className="flex-grow-1 px-4">
@@ -76,12 +80,24 @@ export default function LeadDetails() {
       <div className="mb-4">
         <h4 className="mb-3">Lead Details</h4>
         <ul className="list-group" style={{ maxWidth: "400px" }}>
-          <li className="list-group-item"><strong>Lead Name:</strong> {Lead.name}</li>
-          <li className="list-group-item"><strong>Sales Agent:</strong> {Lead.salesAgent?.name || "N/A"}</li>
-          <li className="list-group-item"><strong>Lead Source:</strong> {Lead.source}</li>
-          <li className="list-group-item"><strong>Lead Status:</strong> {Lead.status}</li>
-          <li className="list-group-item"><strong>Priority:</strong> {Lead.priority}</li>
-          <li className="list-group-item"><strong>Time to Close:</strong> {Lead.timeToClose} Days</li>
+          <li className="list-group-item">
+            <strong>Lead Name:</strong> {Lead.name}
+          </li>
+          <li className="list-group-item">
+            <strong>Sales Agent:</strong> {Lead.salesAgent?.name || "N/A"}
+          </li>
+          <li className="list-group-item">
+            <strong>Lead Source:</strong> {Lead.source}
+          </li>
+          <li className="list-group-item">
+            <strong>Lead Status:</strong> {Lead.status}
+          </li>
+          <li className="list-group-item">
+            <strong>Priority:</strong> {Lead.priority}
+          </li>
+          <li className="list-group-item">
+            <strong>Time to Close:</strong> {Lead.timeToClose} Days
+          </li>
         </ul>
       </div>
 
@@ -116,7 +132,11 @@ export default function LeadDetails() {
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
         />
-        <button className="btn btn-primary" onClick={handleSubmit}>
+        <button
+          className="btn btn-primary"
+          onClick={handleSubmit}
+          disabled={!Lead?.salesAgent?._id && !Lead?.salesAgent?.id}
+        >
           Submit
         </button>
       </div>

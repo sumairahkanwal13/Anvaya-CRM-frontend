@@ -39,8 +39,7 @@ export default function LeadDetails() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             commentText: newComment,
-
-            // ❗ Temporary log added — we will fix after we see the structure
+            lead: id,
             author: Lead?.salesAgent?.id,  
           }),
         }

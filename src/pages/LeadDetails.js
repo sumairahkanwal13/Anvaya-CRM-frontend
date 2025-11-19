@@ -1,6 +1,7 @@
-import { useEffect, useState, useLocation } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useFetch from "../useFetch";
+import { useLocation } from "react-router-dom";
 
 export default function LeadDetails() {
   const { id } = useParams();

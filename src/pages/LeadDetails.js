@@ -4,8 +4,8 @@ import useFetch from "../useFetch";
 
 export default function LeadDetails() {
   const { id } = useParams();
+  console.log("useParams id:", id);
 
-  
   const { data: Lead, loading: leadLoading, error: leadError } = useFetch(
     `https://anvaya-crm-backend-rosy.vercel.app/leads/${id}`,
     {}

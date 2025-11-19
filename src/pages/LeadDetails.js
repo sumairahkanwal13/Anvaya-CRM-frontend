@@ -1,93 +1,159 @@
-import useFetch from "../useFetch";
-import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 
 export default function LeadDetails() {
-  const { id } = useParams();
-  const { data: Lead, loading, error } = useFetch(`https://anvaya-crm-backend-rosy.vercel.app/leads/${id}`, {});
-  const { data: comments, loading: commentsLoading } = useFetch(`https://anvaya-crm-backend-rosy.vercel.app/leads/${id}/comments`, {});
+    const { id } = useParams();
+    const navigate = useNavigate();
 
-  const [ newComment, setNewComment ] = useState("");
-  const [ commentList, setCommentList ] = useState([]);
+    const [lead, setLead] = useState(null);
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState("");
 
-  if (!commentsLoading && commentList.length === 0 && comments.length > 0) {
-    setCommentList(comments);
-  }
+    const API = "https://anvaya-crm-backend-rosy.vercel.app";
 
-  const handleSubmit = async() => {
-    if (!newComment.trim()) return ("Please enter a comment first.");
-    try {
-      const response = await fetch(`https://anvaya-crm-backend-rosy.vercel.app/leads/${id}/comments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          commentText: newComment,
-          lead: id,
-          author: Lead?.salesAgent?._id
-        })
-      });
+    // Fetch Lead Details
+    useEffect(() => {
+        fetch(`${API}/leads/${id}`)
+            .then((res) => res.json())
+            .then((data) => setLead(data))
+            .catch((err) => console.log(err));
 
-      if (!response.ok) throw new Error ("Failed to post comment.");
+        fetchComments();
+    }, [id]);
 
-      const createdComment = await response.json();
-      setCommentList([createdComment, ...commentList]);
-      setNewComment("");
-    } catch (error) {
-      console.log(error);
-    }
-  }
+    // Fetch Comments for this lead
+    const fetchComments = () => {
+        fetch(`${API}/comments/${id}`)
+            .then((res) => res.json())
+            .then((data) => setComments(data))
+            .catch((err) => console.log(err));
+    };
 
-  if (loading) return <p className="text-center mt-5">.....Loading Lead Data</p>;
-  if (error) return <p className="text-center mt-5">Error occurred while fetching data.</p>;
+    // Add new comment
+    const handleSubmitComment = async (e) => {
+        e.preventDefault();
+        if (!newComment.trim()) return;
 
-  return (
-    <div className="flex-grow-1 px-4">
-      <h2 className="text-center mb-4 mt-4">Lead Management: {Lead.name}</h2>
+        await fetch(`${API}/comments`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                leadId: id,
+                text: newComment,
+                author: "Admin",
+            }),
+        });
 
-      <div className="mb-4">
-        <h4 className="mb-3">Lead Details</h4>
-        {Lead && (
-          <ul className="list-group" style={{ maxWidth: "400px" }}>
-            <li className="list-group-item"><strong>Lead Name:</strong> {Lead.name}</li>
-            <li className="list-group-item"><strong>Sales Agent:</strong> {Lead.salesAgent?.name || "N/A"}</li>
-            <li className="list-group-item"><strong>Lead Source:</strong> {Lead.source}</li>
-            <li className="list-group-item"><strong>Lead Status:</strong> {Lead.status}</li>
-            <li className="list-group-item"><strong>Priority:</strong> {Lead.priority}</li>
-            <li className="list-group-item"><strong>Time to Close:</strong> {Lead.timeToClose} Days</li>
-          </ul>
-        )}
-      </div>
+        setNewComment("");
+        fetchComments();
+    };
 
-      <div className="mt-4">
-        <h4>Comments</h4>
-        {commentsLoading ? (
-          <p>Loading Comments...</p>
-        ) : comments.length === 0 ? (
-          <p>No Comments yet</p>
-        ) : (
-          commentList.map((comment) => (
-            <div key={comment.id} className="border p-2 mb-2 rounded">
-              <p>
-                <strong>{comment.author?.name || "Anonymous"} - {new Date(comment.createdAt).toLocaleString()}</strong>
-              </p>
-              <p>{comment.commentText}</p>
+    if (!lead) return <p className="text-center mt-5">Loading Lead Details...</p>;
+
+    return (
+        <div className="container mt-4">
+
+            {/* Page Title */}
+            <h2 className="text-center mb-4">Lead Management: {lead.name}</h2>
+
+            <div className="row">
+
+                {/* Sidebar */}
+                <div className="col-3">
+                    <div className="card p-3 shadow-sm">
+                        <h5 className="mb-3">Menu</h5>
+
+                        <button 
+                            className="btn btn-outline-secondary w-100 mb-2"
+                            onClick={() => navigate(-1)}
+                        >
+                            Back
+                        </button>
+
+                        <Link 
+                            className="btn btn-outline-secondary w-100"
+                            to="/leadList"
+                        >
+                            Back to Lead List
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Main Section */}
+                <div className="col-9">
+
+                    {/* Lead Details */}
+                    <div className="card p-4 shadow-sm">
+                        <h4>Lead Details</h4>
+
+                        <p><strong>Name:</strong> {lead.name}</p>
+                        <p><strong>Sales Agent:</strong> {lead.salesAgent?.name || "Not Assigned"}</p>
+                        <p><strong>Source:</strong> {lead.source}</p>
+                        <p><strong>Status:</strong> {lead.status}</p>
+                        <p><strong>Priority:</strong> {lead.priority}</p>
+                        <p><strong>Time to Close:</strong> {lead.timeToClose || "N/A"}</p>
+
+                        {/* Tags */}
+                        <p>
+                            <strong>Tags:</strong>{" "}
+                            {lead.tags?.length > 0 ? (
+                                lead.tags.map((tag, idx) => (
+                                    <span 
+                                        key={idx} 
+                                        className="badge bg-info text-dark me-1"
+                                    >
+                                        {tag}
+                                    </span>
+                                ))
+                            ) : (
+                                "No Tags"
+                            )}
+                        </p>
+
+                        <Link 
+                            to={`/editLead/${lead._id}`} 
+                            className="btn btn-primary mt-3"
+                        >
+                            Update Lead
+                        </Link>
+                    </div>
+
+                    {/* Comments Section */}
+                    <div className="card p-4 mt-4 shadow-sm">
+                        <h4>Comments</h4>
+
+                        {/* List of Comments */}
+                        <div className="mt-3">
+                            {comments.length === 0 ? (
+                                <p className="text-muted">No comments yet.</p>
+                            ) : (
+                                comments.map((c) => (
+                                    <div key={c._id} className="border rounded p-3 mb-2">
+                                        <p><strong>{c.author}</strong> – {new Date(c.createdAt).toLocaleString()}</p>
+                                        <p>{c.text}</p>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        {/* Add Comment */}
+                        <form onSubmit={handleSubmitComment} className="mt-3">
+                            <textarea
+                                className="form-control"
+                                rows="3"
+                                placeholder="Write a comment..."
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                            ></textarea>
+
+                            <button className="btn btn-success mt-2">
+                                Submit Comment
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
             </div>
-          ))
-        )}
-      </div>
-
-      <div className="mt-4">
-        <textarea
-          className="form-control mb-2"
-          placeholder="Add a new comment..."
-          rows="2"
-          cols="50"
-          onChange={(e) => setNewComment(e.target.value)}
-        ></textarea>
-        <button className="btn btn-primary" onClick={handleSubmit}>Submit</button>
-      </div>
-    </div>
-  );
+        </div>
+    );
 }

@@ -139,7 +139,7 @@ export default function LeadDetails() {
         <button
           className="btn btn-primary"
           onClick={handleSubmit}
-          disabled={!Lead?.salesAgent?._id && !Lead?.salesAgent?.id}
+          //disabled={!Lead?.salesAgent?._id && !Lead?.salesAgent?.id}
         >
           Submit
         </button>

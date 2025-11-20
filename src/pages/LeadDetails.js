@@ -7,7 +7,7 @@ export default function LeadDetails() {
   const { _id } = useParams();
   const location = useLocation();
 
-  console.log("useParams id:", id);
+  console.log("useParams id:", _id);
   console.log("Current location pathname:", location.pathname);
 
   const { data: Lead, loading: leadLoading, error: leadError } = useFetch(

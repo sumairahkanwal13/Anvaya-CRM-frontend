@@ -39,7 +39,7 @@ export default function LeadDetails() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: newComment, author: authorId, }),
+          body: JSON.stringify({ text: newComment }),
         }
       );
 

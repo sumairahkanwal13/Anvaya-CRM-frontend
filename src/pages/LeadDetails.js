@@ -4,20 +4,20 @@ import useFetch from "../useFetch";
 import { useLocation } from "react-router-dom";
 
 export default function LeadDetails() {
-  const { id } = useParams();
+  const { _id } = useParams();
   const location = useLocation();
 
   console.log("useParams id:", id);
   console.log("Current location pathname:", location.pathname);
 
   const { data: Lead, loading: leadLoading, error: leadError } = useFetch(
-    `https://anvaya-crm-backend-rosy.vercel.app/leads/${id}`,
+    `https://anvaya-crm-backend-rosy.vercel.app/leads/${_id}`,
     {}
   );
 
   
   const { data: comments, loading: commentsLoading, error: commentsError } = useFetch(
-    `https://anvaya-crm-backend-rosy.vercel.app/leads/${id}/comments`,
+    `https://anvaya-crm-backend-rosy.vercel.app/leads/${_id}/comments`,
     []
   );
 
@@ -47,7 +47,7 @@ export default function LeadDetails() {
 
     try {
       const response = await fetch(
-        `https://anvaya-crm-backend-rosy.vercel.app/leads/${id}/comments`,
+        `https://anvaya-crm-backend-rosy.vercel.app/leads/${_id}/comments`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

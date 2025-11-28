@@ -24,7 +24,7 @@ export default function LeadList() {
     if (error) return <p className="text-center mt-5">Error occurred while fetching data.</p>;
 
     return (
-        <div className="flex-grow-1 px-2">
+        <div className="container-fluid px-4" style={{ maxWidth: "1100px", margin: "0 auto" }}>
             <h2 className="text-center mb-4">Lead List</h2>
 
             <div className="d-flex flex-wrap gap-3 mb-4 align-items-center">
@@ -79,7 +79,7 @@ export default function LeadList() {
                         Lead.map((lead) => {
                             const leadId = lead._id || lead.id;
                             return (
-                                <div key={leadId} className="card p-3 shadow-sm w-100">
+                                <div key={leadId} className="card p-3 shadow-sm mb-3">
                                     <p><strong>Name:</strong> {lead.name}</p>
                                     <p><strong>Status:</strong> {lead.status}</p>
                                     <p><strong>Sales Agent:</strong> {lead.salesAgent?.name || "N/A"}</p>

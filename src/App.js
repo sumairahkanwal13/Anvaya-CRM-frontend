@@ -12,11 +12,12 @@ import Report from './pages/Report';
 import LeadStatusView from './pages/LeadStatusView';
 import SalesAgentDetails from './pages/SalesAgentDetails';
 import Sidebar from './components/Sidebar';
+import Settings from './pages/Settings';
 
 function App() {
   return (
     <Router>
-      <div className='d-flex'>
+      <div className='layout-container'>
       <Sidebar/>
       <div className='flex-grow-1 main-content px-4'>
       <Routes>
@@ -29,6 +30,7 @@ function App() {
         <Route path='/leadStatusView' element={<LeadStatusView/>}/>
         <Route path='/salesAgentDetails' element={<SalesAgentDetails/>}/>
         <Route path='/report' element={<Report/>}/>
+        <Route path="/settings" element={<Settings />} />
       </Routes>
       </div>
       </div>

@@ -52,7 +52,7 @@ export default function Settings() {
     await fetch(endpoint, { method: "DELETE" });
 
     if (type === "lead") {
-      setLeads((prev) => prev.filter((item) => item._id !== id));
+      setLeads((prev) => prev.filter((item) => item.id !== id));
     } else {
       setAgents((prev) => prev.filter((item) => item._id !== id));
     }

@@ -80,8 +80,7 @@ export default function SalesAgentDetails() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <option value="All">All</option>
-              <option value="New">New</option>
+              <option value="All">All Status</option>
               <option value="Contacted">Contacted</option>
               <option value="Qualified">Qualified</option>
               <option value="Closed">Closed</option>
@@ -95,7 +94,7 @@ export default function SalesAgentDetails() {
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
             >
-              <option value="All">All</option>
+              <option value="All">All Priorities</option>
               <option value="High">High</option>
               <option value="Medium">Medium</option>
               <option value="Low">Low</option>

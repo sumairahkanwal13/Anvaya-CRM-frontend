@@ -11,7 +11,7 @@ export default function LeadStatusView() {
     []
   );
 
-  const [status, setStatus] = useState("New");
+  const [status, setStatus] = useState("");
   const [agentFilter, setAgentFilter] = useState("All");
   const [priorityFilter, setPriorityFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("newest");
@@ -20,9 +20,9 @@ export default function LeadStatusView() {
   if (error) return <p className="text-center mt-4">Error occurred while fetching data.</p>;
 
   
-  let filteredLeads = Lead.filter((lead) => lead.status === status);
+  let filteredLeads =
+    status === "" ? [...Lead] : Lead.filter((lead) => lead.status === status);
 
-  console.log("find agent's id:", agents)
   if (agentFilter !== "All") {
     filteredLeads = filteredLeads.filter((lead) => lead.salesAgent?.id === agentFilter);
   }
@@ -51,7 +51,7 @@ export default function LeadStatusView() {
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
-              <option value="New">New</option>
+              <option value="">All Status</option>
               <option value="Contacted">Contacted</option>
               <option value="Qualified">Qualified</option>
               <option value="Closed">Closed</option>

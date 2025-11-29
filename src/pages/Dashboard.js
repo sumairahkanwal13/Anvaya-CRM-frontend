@@ -1,4 +1,4 @@
-import Sidebar from "../components/Sidebar";
+import { useState } from "react";
 import useFetch from "../useFetch";
 import { Link } from "react-router-dom";
 
@@ -11,15 +11,18 @@ export default function Dashboard() {
   const { data: report } = useFetch(
     "https://anvaya-crm-backend-rosy.vercel.app/report/pipeline",
     {
-      new: 0,
       contacted: 0,
       qualified: 0,
+      closed: 0,
     }
   );
 
+  const [ statusFilter, setStatusFilter ] = useState("");
+
   if (loading) return <p className="text-center mt-5">Loading...</p>;
-  if (error)
-    return <p className="text-center mt-5">Error occurred while fetching data.</p>;
+  if (error) return <p className="text-center mt-5">Error occurred while fetching data.</p>;
+
+  const filteredLead = statusFilter ? Lead.filter((lead) => lead.status === statusFilter) : Lead;
 
   return (
     <div className="px-4 mt-4">
@@ -30,7 +33,7 @@ export default function Dashboard() {
         <h4 className="mb-3">Leads Overview</h4>
 
         <div className="d-flex flex-wrap gap-3">
-          {Lead.slice(0, 3).map((lead) => (
+          {filteredLead.slice(0, 3).map((lead) => (
             <div
               key={lead._id || lead.name}
               className="card p-3 shadow-sm"
@@ -44,14 +47,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      
       <div className="card p-3 mb-4 shadow-sm">
         <h5>Lead Status Summary</h5>
         <ul className="list-unstyled mt-3">
-          <li className="mb-2">
-            New: <span className="badge bg-success">{report?.new ?? 0}</span>
-          </li>
-
           <li className="mb-2">
             Contacted:{" "}
             <span className="badge bg-warning text-dark">
@@ -65,18 +63,47 @@ export default function Dashboard() {
               {report?.qualified ?? 0}
             </span>
           </li>
+
+          <li className="mb-2">
+            Closed: <span className="badge bg-success">{report?.closed ?? 0}</span>
+          </li>
         </ul>
       </div>
 
-      
       <div className="d-flex align-items-center justify-content-between mt-3">
         <div>
-          <span className="badge bg-success me-2 px-3 py-2">New</span>
-          <span className="badge bg-warning text-dark me-2 px-3 py-2">
+
+          <span
+            className={`badge me-2 px-3 py-2 ${
+              statusFilter === "Contacted"
+                ? "bg-warning text-dark"
+                : "bg-secondary"
+            }`}
+            onClick={() =>
+              setStatusFilter(statusFilter === "Contacted" ? "" : "Contacted")
+            }
+          >
             Contacted
           </span>
-          <span className="badge bg-info text-dark me-2 px-3 py-2">
+          
+          <span className={`badge me-2 px-3 py-2 ${
+            statusFilter === "Qulaified" ? "bg-info text-dark" : "bg-secondary"
+          }`}
+          onClick={() => setStatusFilter(statusFilter === "Qualified" ? "" : "Qualified")}
+          >
             Qualified
+          </span>
+
+          <span
+            className={`badge me-2 px-3 py-2 ${
+              statusFilter === "Closed" ? "bg-dark" : "bg-secondary"
+            }`}
+            style={{ cursor: "pointer", color: "white" }}
+            onClick={() =>
+              setStatusFilter(statusFilter === "Closed" ? "" : "Closed")
+            }
+          >
+            Closed
           </span>
         </div>
 

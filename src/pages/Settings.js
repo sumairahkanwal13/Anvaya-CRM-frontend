@@ -40,16 +40,25 @@ export default function Settings() {
 
   
   const handleDelete = async () => {
-    if (!deleteTarget) return;
+  if (!deleteTarget) return;
 
-    const { type, id } = deleteTarget;
+  const { type, id } = deleteTarget;
 
-    const endpoint =
-      type === "lead"
-        ? `https://anvaya-crm-backend-rosy.vercel.app/leads/${id}`
-        : `https://anvaya-crm-backend-rosy.vercel.app/agents/${id}`;
+  const endpoint =
+    type === "lead"
+      ? `https://anvaya-crm-backend-rosy.vercel.app/leads/${id}`
+      : `https://anvaya-crm-backend-rosy.vercel.app/agents/${id}`;
 
-    await fetch(endpoint, { method: "DELETE" });
+
+  try {
+    const res = await fetch(endpoint, { method: "DELETE" });
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("Delete failed:", data.error || data);
+      alert(`Delete failed: ${data.error || "Unknown error"}`);
+      return;
+    }
 
     if (type === "lead") {
       setLeads((prev) => prev.filter((item) => item.id !== id));
@@ -58,7 +67,14 @@ export default function Settings() {
     }
 
     setShowModal(false);
-  };
+    setDeleteTarget(null);
+    alert(`${type} deleted successfully!`);
+  } catch (err) {
+    console.error("Network error:", err);
+    alert("Failed to delete. Please try again.");
+  }
+};
+
 
   if (loading) return <p className="text-center mt-4">Loading...</p>;
 

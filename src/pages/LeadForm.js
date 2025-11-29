@@ -1,95 +1,93 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
+import { toast } from "react-toastify";
 
-export default function LeadForm(){
+export default function LeadForm() {
+  const [formData, setFormData] = useState({
+    name: "",
+    source: "",
+    salesAgent: "",
+    status: "",
+    tags: [],
+    timeToClose: "",
+    priority: "Medium",
+  });
 
-    const [formData, setFormData ] = useState({
-        name: "",
-        source: "",
-        salesAgent: "",
-        status: "New",
-        tags: [],
-        timeToClose: "",
-        priority: "Medium",
+  const [agents, setAgents] = useState([]);
+  const [tagInput, setTagInput] = useState("");
 
-    });
-    const [successMessage, setSuccessMessage] = useState(""); 
-    const [errorMessage, setErrorMessage] = useState("");
-
-    const [ agents, setAgents ] = useState([]);
-    const [ tagInput, setTagInput ] = useState("");
-   useEffect(() => {
+  useEffect(() => {
     fetch("https://anvaya-crm-backend-rosy.vercel.app/agents")
       .then((res) => res.json())
       .then((data) => setAgents(data))
       .catch(() => setAgents([]));
   }, []);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevState) => ({
-            ...prevState, [name] : value
-        }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleAddTag = () => {
+    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        tags: [...prev.tags, tagInput.trim()],
+      }));
     }
+    setTagInput("");
+  };
 
-    const handleAddTag = () => {
-        if(tagInput.trim() && !formData.tags.includes(tagInput.trim())){
-            setFormData((prev) => ({
-                ...prev, tags:[...prev.tags, tagInput.trim()]
-            }));
+  const handleRemoveTag = (tag) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((t) => t !== tag),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(
+        "https://anvaya-crm-backend-rosy.vercel.app/leads",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         }
-        setTagInput("");
-    };
+      );
 
-    const handleRemoveTag = (tag) =>{
-        setFormData((prev) => ({
-            ...prev,
-            tags: prev.tags.filter((t) => t !== tag)
-        }));
-    };
+      if (!response.ok) {
+        throw new Error("Failed to add new lead.");
+      }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log("Submitting lead data:", formData);
+      await response.json();
+      toast.success("New Lead added successfully!");
 
-        try{
-            const response = await fetch("https://anvaya-crm-backend-rosy.vercel.app/leads", {
-                method: "POST",
-                headers: {
-                    "Content-Type" : "application/json"
-                },
-                body: JSON.stringify(formData)
-            });
-            if(!response.ok){
-                const errorData = await response.json();
-                console.log("Error response:", errorData);
-                throw new Error ("Failed to add new lead.")
-            }
-
-            const data = await response.json();
-            console.log("Lead Added: ", data);
-            setSuccessMessage("New Lead added successfully!")
-
-        }catch(error){
-            console.log(error)
-            setErrorMessage("An error occurred while adding the lead. Please try again.");
-        }
+      // Reset form after success
+      setFormData({
+        name: "",
+        source: "",
+        salesAgent: "",
+        status: "",
+        tags: [],
+        timeToClose: "",
+        priority: "Medium",
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error("An error occurred while adding the lead. Please try again.");
     }
-    return (
+  };
+
+  return (
     <div className="lead-form-page px-4 mt-4">
       <h2 className="text-center mb-4">Create New Lead</h2>
-
-      {successMessage && (
-        <div className="alert alert-success" role="alert">
-          {successMessage}
-        </div>
-      )}
-
-      {errorMessage && (
-        <div className="alert alert-danger" role="alert">
-          {errorMessage}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="card p-4 shadow-sm">
         <div className="mb-3">
@@ -146,12 +144,13 @@ export default function LeadForm(){
             className="form-select"
             value={formData.status}
             onChange={handleChange}
+            required
           >
-            <option>New</option>
-            <option>Contacted</option>
-            <option>Qualified</option>
-            <option>Proposal Sent</option>
-            <option>Closed</option>
+            <option value="">Select Status</option>
+            <option value="Contacted">Contacted</option>
+            <option value="Qualified">Qualified</option>
+            <option value="Proposal Sent">Proposal Sent</option>
+            <option value="Closed">Closed</option>
           </select>
         </div>
 

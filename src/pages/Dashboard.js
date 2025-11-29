@@ -22,28 +22,37 @@ export default function Dashboard() {
   if (loading) return <p className="text-center mt-5">Loading...</p>;
   if (error) return <p className="text-center mt-5">Error occurred while fetching data.</p>;
 
-  const filteredLead = statusFilter ? Lead.filter((lead) => lead.status === statusFilter) : Lead;
+  const safeLead = Array.isArray(Lead) ? Lead : [];
+  const filteredLead = statusFilter
+  ? safeLead.filter((lead) => lead.status === statusFilter)
+  : safeLead;
+
+
+  //const filteredLead = statusFilter ? Lead.filter((lead) => lead.status === statusFilter) : Lead;
 
   return (
-    <div className="px-4 mt-4">
+  <div className="px-4 mt-4">
       <h2 className="text-center mb-4">Anvaya CRM Dashboard</h2>
 
-      
       <div className="mb-4">
         <h4 className="mb-3">Leads Overview</h4>
 
         <div className="d-flex flex-wrap gap-3">
-          {filteredLead.slice(0, 3).map((lead) => (
-            <div
-              key={lead._id || lead.name}
-              className="card p-3 shadow-sm"
-              style={{ width: "220px" }}
-            >
-              <h6 className="mb-2">{lead.name}</h6>
-              <p className="small mb-1">Status: {lead.status}</p>
-              <p className="small text-muted">Priority: {lead.priority}</p>
-            </div>
-          ))}
+          {filteredLead.length === 0 ? (
+            <p className="text-center w-100">We could not find any leads in the selected lead status.</p>
+          ) : (
+            filteredLead.slice(0, 3).map((lead) => (
+              <div
+                key={lead._id || lead.name}
+                className="card p-3 shadow-sm"
+                style={{ width: "220px" }}
+              >
+                <h6 className="mb-2">{lead.name}</h6>
+                <p className="small mb-1">Status: {lead.status}</p>
+                <p className="small text-muted">Priority: {lead.priority}</p>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
@@ -72,24 +81,28 @@ export default function Dashboard() {
 
       <div className="d-flex align-items-center justify-content-between mt-3">
         <div>
-
           <span
-            className={`badge me-2 px-3 py-2 ${
+            className={`badge me-2 px-3 py-2  ${
               statusFilter === "Contacted"
                 ? "bg-warning text-dark"
                 : "bg-secondary"
             }`}
+            style={{ cursor: "pointer", color: "white" }}
             onClick={() =>
               setStatusFilter(statusFilter === "Contacted" ? "" : "Contacted")
             }
           >
             Contacted
           </span>
-          
-          <span className={`badge me-2 px-3 py-2 ${
-            statusFilter === "Qulaified" ? "bg-info text-dark" : "bg-secondary"
-          }`}
-          onClick={() => setStatusFilter(statusFilter === "Qualified" ? "" : "Qualified")}
+
+          <span
+            className={`badge me-2 px-3 py-2 ${
+              statusFilter === "Qualified" ? "bg-info text-dark" : "bg-secondary"
+            }`}
+            style={{ cursor: "pointer", color: "white" }}
+            onClick={() =>
+              setStatusFilter(statusFilter === "Qualified" ? "" : "Qualified")
+            }
           >
             Qualified
           </span>
@@ -113,4 +126,5 @@ export default function Dashboard() {
       </div>
     </div>
   );
+    
 }

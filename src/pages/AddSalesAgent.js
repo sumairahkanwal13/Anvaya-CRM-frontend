@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function AddSalesAgent() {
   const [formData, setFormData] = useState({
@@ -7,8 +7,25 @@ export default function AddSalesAgent() {
     email: "",
   });
 
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [existingEmail, setExistingEmail] = useState([]);
+
+  useEffect(() => {
+    const fetchExistingEmails = async () => {
+      try {
+        const response = await fetch(
+          "https://anvaya-crm-backend-rosy.vercel.app/agents"
+        );
+        if (!response.ok) throw new Error("Failed to fetch agents.");
+        const data = await response.json();
+        const emails = data.map((agent) => agent.email);
+        setExistingEmail(emails);
+      } catch (error) {
+        console.error("Error fetching agent: ", error);
+        toast.error("Failed to load agents.");
+      }
+    };
+    fetchExistingEmails();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,14 +37,23 @@ export default function AddSalesAgent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (existingEmail.includes(formData.email)) {
+      toast.error("This email already exists. Please choose another.");
+      return;
+    }
+
     try {
-      const response = await fetch("https://anvaya-crm-backend-rosy.vercel.app/agents", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://anvaya-crm-backend-rosy.vercel.app/agents",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to add new agent.");
@@ -36,36 +62,27 @@ export default function AddSalesAgent() {
       const data = await response.json();
       console.log("New agent added:", data);
 
-      setSuccessMessage("New agent added successfully!");
+      toast.success("New agent added successfully!");
+
+      // Reset form
       setFormData({ name: "", email: "" });
+
+      // Update email list instantly
+      setExistingEmail((prev) => [...prev, formData.email]);
     } catch (error) {
       console.log(error);
-      setErrorMessage(
-        "An error occurred while adding the agent. Please try again."
-      );
+      toast.error("An error occurred while adding the agent.");
     }
   };
 
   return (
     <div className="container mt-5">
-        
       <div className="row justify-content-center">
         <div className="col-md-6">
-
           <div className="card shadow-sm p-4">
-
             <h2 className="text-center mb-4">Add New Sales Agent</h2>
 
-            {successMessage && (
-              <div className="alert alert-success">{successMessage}</div>
-            )}
-
-            {errorMessage && (
-              <div className="alert alert-danger">{errorMessage}</div>
-            )}
-
             <form onSubmit={handleSubmit}>
-
               <div className="mb-3">
                 <label className="form-label">Agent Name:</label>
                 <input
@@ -95,10 +112,8 @@ export default function AddSalesAgent() {
               <button className="btn btn-success w-100" type="submit">
                 Create Agent
               </button>
-
             </form>
           </div>
-
         </div>
       </div>
     </div>

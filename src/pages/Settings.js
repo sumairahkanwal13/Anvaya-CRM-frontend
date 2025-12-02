@@ -19,7 +19,7 @@ export default function Settings() {
   const fetchAgents = async () => {
     const res = await fetch("https://anvaya-crm-backend-rosy.vercel.app/agents");
     const data = await res.json();
-    setAgents(data);
+    setAgents(data.map(a => ({ ...a, id: a._id })));
   };
 
   
@@ -34,7 +34,7 @@ export default function Settings() {
 
  
   const confirmDelete = (type, id) => {
-    setDeleteTarget({ type, id });
+    setDeleteTarget({ type, id: id.trim() });
     setShowModal(true);
   };
 
@@ -43,15 +43,16 @@ export default function Settings() {
   if (!deleteTarget) return;
 
   const { type, id } = deleteTarget;
+  const cleanId = id.trim();
 
   const endpoint =
     type === "lead"
-      ? `https://anvaya-crm-backend-rosy.vercel.app/leads/${id}`
-      : `https://anvaya-crm-backend-rosy.vercel.app/agents/${id}`;
+      ? `https://anvaya-crm-backend-rosy.vercel.app/leads/${cleanId}`
+      : `https://anvaya-crm-backend-rosy.vercel.app/agents/${cleanId}`;
 
 
   try {
-    const res = await fetch(endpoint, { method: "DELETE" });
+    const res = await fetch(endpoint, { method: "DELETE",});
     const data = await res.json();
 
     if (!res.ok) {
@@ -70,7 +71,6 @@ export default function Settings() {
     setDeleteTarget(null);
     alert(`${type} deleted successfully!`);
   } catch (err) {
-    console.error("Network error:", err);
     alert("Failed to delete. Please try again.");
   }
 };
